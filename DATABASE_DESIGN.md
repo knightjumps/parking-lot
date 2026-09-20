@@ -506,3 +506,30 @@ INR 105.50 -> 10,550 paise
 > At exit, payment is recorded separately with an idempotency key to prevent duplicate charges. After payment succeeds, a short transaction closes the session and releases the spot. I would not hold a database lock while calling the external payment provider.
 
 This answer demonstrates relational modeling, normalization, transactions, concurrency control, payment correctness, indexing, scalability, and awareness of real-world trade-offs.
+
+## Complete table catalog
+
+| Table | Required? | Use case |
+|---|---|---|
+| `parking_lot` | Core | Stores each physical parking facility, its address, timezone, and operational status. |
+| `parking_floor` | Core | Represents floors or zones within a parking lot and groups their parking spots. |
+| `parking_spot` | Core | Stores every physical spot, its type, current status, floor, and locking version. It is used during allocation and release. |
+| `gate` | Core | Stores entrance and exit gates so each parking session can record where a vehicle entered and exited. |
+| `vehicle` | Core | Stores vehicle registration and type for ticketing, parking history, subscriptions, and repeat visits. |
+| `parking_session` | Core | Represents the complete parking lifecycle: ticket issuance, assigned vehicle and spot, entry, payment, exit, fee, and final status. |
+| `payment` | Core | Records every payment attempt, method, amount, provider reference, idempotency key, status, and failure information. |
+| `pricing_policy` | Core for configurable pricing | Defines a named, versioned pricing configuration and the time range during which it is valid. |
+| `pricing_rule` | Core for configurable pricing | Stores the individual rate slabs within a pricing policy, optionally varying by vehicle or spot type. |
+| `spot_availability` | Optional read model | Maintains precomputed available-spot counts per floor and type for fast display-board reads. It can be replaced by Redis or direct queries at smaller scale. |
+| `reservation` | Optional | Supports advance spot booking, reservation expiry, cancellation, and arrival tracking. |
+| `customer` | Optional | Stores registered customer profiles used for saved vehicles, loyalty programs, and account-level parking history. |
+| `subscription` | Optional | Stores monthly, annual, employee, or resident parking plans and their validity periods. |
+| `vehicle_pass` | Optional | Associates a vehicle with a subscription or access pass and controls which lots, floors, or zones it may use. |
+| `coupon` | Optional | Stores promotional codes, validation constraints, discounts, usage limits, and validity periods. |
+| `payment_refund` | Optional | Records full or partial refunds without overwriting the original payment transaction. |
+| `spot_status_history` | Optional audit table | Records spot state transitions for auditing, occupancy analysis, and operational troubleshooting. |
+| `parking_session_event` | Optional audit table | Stores append-only lifecycle events such as ticket issued, payment attempted, payment completed, and gate opened. |
+| `electric_charging_session` | Optional | Tracks EV charging time, energy consumed, charger identity, and charging fees separately from parking fees. |
+| `operator_account` | Optional | Stores administrators and attendants, their roles, authentication details, and authorization status. |
+
+For the minimum interview solution, the essential tables are `parking_lot`, `parking_floor`, `parking_spot`, `gate`, `vehicle`, `parking_session`, `payment`, `pricing_policy`, and `pricing_rule`. Add the optional tables only when the interviewer introduces the corresponding requirement.
