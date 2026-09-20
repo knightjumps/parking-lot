@@ -1,10 +1,15 @@
 package parkinglot.pricing;
+
 import parkinglot.ParkingTicket;
+
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.Duration;
 import java.time.Instant;
-/** First hour $4, hours 2-3 $3.50 each, all later hours $2.50 each. */
+
+/**
+ * First hour $4, hours 2-3 $3.50 each, all later hours $2.50 each.
+ */
 public final class HourlyPricingStrategy implements PricingStrategy {
     public BigDecimal calculate(ParkingTicket ticket, Instant exitTime) {
         long minutes = Math.max(1, Duration.between(ticket.entryTime(), exitTime).toMinutes());

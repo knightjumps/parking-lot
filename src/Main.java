@@ -10,7 +10,9 @@ import parkinglot.vehicle.Car;
 import parkinglot.vehicle.Motorcycle;
 import parkinglot.vehicle.Truck;
 
-/** Small executable example. Run this class from IntelliJ to see the main parking flow. */
+/**
+ * Small executable example. Run this class from IntelliJ to see the main parking flow.
+ */
 public class Main {
     public static void main(String[] args) {
         ParkingLot lot = new ParkingLot("City Center Parking");
