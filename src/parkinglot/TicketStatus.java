@@ -1,2 +1,3 @@
 package parkinglot;
-public enum TicketStatus { ACTIVE, PAID }
+
+public enum TicketStatus {ACTIVE, PAID}

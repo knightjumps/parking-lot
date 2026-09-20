@@ -17,7 +17,9 @@ import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.UUID;
 
-/** Coordinates parking, payment, and exit; it delegates spot and pricing rules. */
+/**
+ * Coordinates parking, payment, and exit; it delegates spot and pricing rules.
+ */
 public final class ParkingLot {
     private final String name;
     private final Map<String, ParkingFloor> floors = new LinkedHashMap<>();
@@ -25,9 +27,14 @@ public final class ParkingLot {
     private final PricingStrategy pricingStrategy;
     private final Clock clock;
 
-    public ParkingLot(String name) { this(name, new HourlyPricingStrategy(), Clock.systemUTC()); }
+    public ParkingLot(String name) {
+        this(name, new HourlyPricingStrategy(), Clock.systemUTC());
+    }
+
     public ParkingLot(String name, PricingStrategy pricingStrategy, Clock clock) {
-        this.name = name; this.pricingStrategy = pricingStrategy; this.clock = clock;
+        this.name = name;
+        this.pricingStrategy = pricingStrategy;
+        this.clock = clock;
     }
 
     public void addFloor(String floorId) {
@@ -35,9 +42,14 @@ public final class ParkingLot {
             throw new IllegalArgumentException("Floor already exists: " + floorId);
         }
     }
-    public void addSpot(String floorId, ParkingSpot spot) { floor(floorId).addSpot(spot); }
 
-    /** Single-JVM atomic reservation: two entrances cannot receive the same final spot. */
+    public void addSpot(String floorId, ParkingSpot spot) {
+        floor(floorId).addSpot(spot);
+    }
+
+    /**
+     * Single-JVM atomic reservation: two entrances cannot receive the same final spot.
+     */
     public synchronized ParkingTicket park(Vehicle vehicle) {
         for (ParkingFloor floor : floors.values()) {
             ParkingSpot spot = floor.reserveSpotFor(vehicle);
@@ -51,7 +63,9 @@ public final class ParkingLot {
         throw new ParkingUnavailableException("No compatible free spot for " + vehicle.type());
     }
 
-    /** Successful payment authorizes exit and releases only the ticket's assigned spot. */
+    /**
+     * Successful payment authorizes exit and releases only the ticket's assigned spot.
+     */
     public synchronized ExitReceipt checkout(String ticketId, Payment payment) {
         ParkingTicket ticket = ticket(ticketId);
         Instant exitTime = Instant.now(clock);
@@ -69,11 +83,13 @@ public final class ParkingLot {
         floors.values().forEach(floor -> lines.add("  " + floor.displayBoard()));
         return String.join(System.lineSeparator(), lines);
     }
+
     private ParkingFloor floor(String floorId) {
         ParkingFloor floor = floors.get(floorId);
         if (floor == null) throw new NoSuchElementException("Unknown floor: " + floorId);
         return floor;
     }
+
     private ParkingTicket ticket(String ticketId) {
         ParkingTicket ticket = activeTickets.get(ticketId);
         if (ticket == null) throw new NoSuchElementException("Active ticket not found: " + ticketId);

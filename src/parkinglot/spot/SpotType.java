@@ -1,2 +1,3 @@
 package parkinglot.spot;
-public enum SpotType { COMPACT, LARGE, MOTORCYCLE, ACCESSIBLE }
+
+public enum SpotType {COMPACT, LARGE, MOTORCYCLE, ACCESSIBLE}
